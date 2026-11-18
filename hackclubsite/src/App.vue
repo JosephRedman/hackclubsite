@@ -14,15 +14,33 @@ onUnmounted(() => {
   if (timer !== undefined) clearInterval(timer)
 })
 
+interface LondonParts {
+  year: number
+  month: number
+  day: number
+  hour: number
+  minute: number
+  second: number
+}
+
 // Get the wall-clock parts of a date as seen in London
-function londonParts(date: Date): Record<string, number> {
+function londonParts(date: Date): LondonParts {
   const parts = new Intl.DateTimeFormat('en-GB', {
     timeZone: TZ,
     year: 'numeric', month: '2-digit', day: '2-digit',
     hour: '2-digit', minute: '2-digit', second: '2-digit',
     hourCycle: 'h23',
   }).formatToParts(date)
-  return Object.fromEntries(parts.map(p => [p.type, Number(p.value)]))
+  const get = (type: Intl.DateTimeFormatPartTypes): number =>
+    Number(parts.find(p => p.type === type)?.value ?? 0)
+  return {
+    year: get('year'),
+    month: get('month'),
+    day: get('day'),
+    hour: get('hour'),
+    minute: get('minute'),
+    second: get('second'),
+  }
 }
 
 // Convert a London wall-clock time into a real Date (handles GMT/BST)

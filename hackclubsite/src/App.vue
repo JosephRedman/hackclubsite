@@ -1,20 +1,21 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import './style.css'
 
-
 const TZ = 'Europe/London'
-const joinCode = 'DTSH44' // replace with your real join code
-const now = ref(new Date())
-let timer
+const joinCode = 'YOUR-CODE' // replace with your real join code
+const now = ref<Date>(new Date())
+let timer: number | undefined
 
 onMounted(() => {
-  timer = setInterval(() => (now.value = new Date()), 1000)
+  timer = window.setInterval(() => (now.value = new Date()), 1000)
 })
-onUnmounted(() => clearInterval(timer))
+onUnmounted(() => {
+  if (timer !== undefined) clearInterval(timer)
+})
 
 // Get the wall-clock parts of a date as seen in London
-function londonParts(date) {
+function londonParts(date: Date): Record<string, number> {
   const parts = new Intl.DateTimeFormat('en-GB', {
     timeZone: TZ,
     year: 'numeric', month: '2-digit', day: '2-digit',
@@ -25,7 +26,7 @@ function londonParts(date) {
 }
 
 // Convert a London wall-clock time into a real Date (handles GMT/BST)
-function londonToDate(y, m, d, h, min) {
+function londonToDate(y: number, m: number, d: number, h: number, min: number): Date {
   const guess = Date.UTC(y, m - 1, d, h, min)
   const p = londonParts(new Date(guess))
   const shown = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute)
@@ -33,7 +34,7 @@ function londonToDate(y, m, d, h, min) {
 }
 
 // Find the next Friday session that hasn't finished yet
-function getNextSession(current) {
+function getNextSession(current: Date): { start: Date; end: Date } | null {
   const p = londonParts(current)
   for (let i = 0; i < 8; i++) {
     const base = new Date(Date.UTC(p.year, p.month - 1, p.day + i))
@@ -50,13 +51,15 @@ function getNextSession(current) {
 
 const session = computed(() => getNextSession(now.value))
 
-const inProgress = computed(() =>
-  session.value && now.value >= session.value.start && now.value < session.value.end
-)
+const inProgress = computed((): boolean => {
+  const s = session.value
+  return s !== null && now.value >= s.start && now.value < s.end
+})
 
 const countdown = computed(() => {
-  if (!session.value) return { days: 0, hours: 0, minutes: 0, seconds: 0 }
-  const total = Math.max(0, Math.floor((session.value.start - now.value) / 1000))
+  const s = session.value
+  if (!s) return { days: 0, hours: 0, minutes: 0, seconds: 0 }
+  const total = Math.max(0, Math.floor((s.start.getTime() - now.value.getTime()) / 1000))
   return {
     days: Math.floor(total / 86400),
     hours: Math.floor((total % 86400) / 3600),
@@ -65,13 +68,14 @@ const countdown = computed(() => {
   }
 })
 
-const pad = n => String(n).padStart(2, '0')
+const pad = (n: number): string => String(n).padStart(2, '0')
 
-const sessionDate = computed(() =>
-  session.value
-    ? session.value.start.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: TZ })
+const sessionDate = computed((): string => {
+  const s = session.value
+  return s
+    ? s.start.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: TZ })
     : ''
-)
+})
 </script>
 
 <template>

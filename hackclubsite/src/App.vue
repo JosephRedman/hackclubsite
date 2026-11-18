@@ -4,7 +4,7 @@ import './style.css'
 
 
 const TZ = 'Europe/London'
-const joinCode = 'YOUR-CODE' // replace with your real join code
+const joinCode = 'DTSH44' // replace with your real join code
 const now = ref(new Date())
 let timer
 
@@ -76,13 +76,13 @@ const sessionDate = computed(() =>
 
 <template>
   <div>
-    <img class="hc-flag" src="/hc-flag.svg" alt="Hack Club flag" />
+    <img class="hc-flag" src="https://assets.hackclub.com/flag-orpheus-left-bw.svg" alt="Hack Club flag" />
 
     <header class="hero">
       <div class="container">
         <span class="eyebrow">Hack Club</span>
         <h1>Huish Episcopi <span>Hack Club</span></h1>
-        <p>Every Friday lunchtime in IT1. Bring a laptop, an idea, and your lunch.</p>
+        <p>Every Friday lunchtime in IT1.</p>
         <a class="btn btn-primary" href="#join">Join us</a>
         <div class="join-code-badge" id="join">
           Join code: <code>{{ joinCode }}</code>
@@ -115,7 +115,7 @@ const sessionDate = computed(() =>
     <section class="section">
       <div class="container">
         <h2 class="section-title">What we do</h2>
-        <p class="section-subtitle">Build things, learn together, and ship projects in a relaxed lunchtime setting.</p>
+        <p class="section-subtitle">Build things, learn together, and ship projects together.</p>
         <div class="grid">
           <div class="card">
             <span class="card-tag tag-red">Build</span>
